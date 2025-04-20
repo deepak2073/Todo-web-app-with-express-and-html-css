@@ -1,0 +1,100 @@
+<head>
+    <title>Document</title>
+    <!-- <style>
+        #taskTable{
+            border: 2px solid black;
+
+        }
+    </style> -->
+    <script>
+
+
+        function gettasks() {
+            fetch("http://localhost:3000/todos", {
+                method: "GET"
+            }).then((resp) => {
+                resp.json().then((data) => {
+                    let lastDiv = document.getElementById("mainArea");
+                    let t = document.createElement("table");
+                    t.setAttribute("border", "2px solid black");
+                    t.setAttribute("id", "taskTable");
+                    t.innerHTML = `<tr>
+                        <th>Id</th>
+                        <th>Task</th>
+                        <th>Completed</th>
+                        <th>Description</th>
+                        </tr>`;
+                    lastDiv.appendChild(t);
+                    let tr = document.createElement("tr");
+                    let arr = data;
+                    for (let i = 0; i < arr.length; i++) {
+                        let tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${arr[i].id}</td>
+                            <td>${arr[i].task}</td>
+                            <td>${arr[i].completed}</td>
+                            <td>${arr[i].description}</td><button type="button" onclick="deleteTask(${arr[i].id})">Delete</button>`
+                            ;
+                        t.appendChild(tr);
+                    }
+
+                });
+            });
+        }
+        gettasks();
+        function deleteTask(id){
+            fetch("http://localhost:3000/todos/"+id,{
+                method:"DELETE"
+                
+            }).then(()=>{
+                console.log("Delete done")
+            })
+        }
+
+
+
+        function onPress() {
+            fetch("http://localhost:3000/todos", {
+                method: "POST",
+                body: JSON.stringify({
+                    task: document.getElementById('task').value,
+                    completed: document.getElementById('completed').value,
+                    description: document.getElementById('description').value
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }).then((resp) => {
+                resp.json().then((data) => {
+                    console.log(data);
+                    
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${data.id}</td>
+                            <td>${data.task}</td>
+                            <td>${data.completed}</td>
+                            <td>${data.description}</td><button type="button" onclick="deleteTask(${data.id})">Delete</button>`;
+                    document.getElementById("taskTable").appendChild(tr);
+                });
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+    <label for="task">Enter the task</label>
+    <input type="text" id="task">
+    <br><br>
+    <label for="completed">Completed</label>
+    <input type="text" id="completed" placeholder="Yes/No">
+    <br><br>
+    <label for="description">Description</label>
+    <input type="text" id="description">
+    <br><br>
+    <button id="setTask" onclick="onPress()">Set a task</button>
+    <div id="mainArea"></div>
+    
+
+
+
+</body>
